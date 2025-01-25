@@ -93,11 +93,11 @@ st.dataframe(dept_df[['Department', 'Total Projects', 'FF Projects', 'FF Percent
 st.header('Fossil-Funded PIs and their Projects')
 
 # Calculate the number of projects for each PI involved in FF-funded projects
-ff_funded_pis = awarded_projects[awarded_projects['Project Status'] == 'Awarded']['PI'].value_counts()
+ff_funded_pis = projects['Principal Investigator'].value_counts()
 
 # Join the PI project counts with the PI data
 pi_projects_df = pd.DataFrame({
-    'PI': ff_funded_pis.index,
+    'Principal Investigator': ff_funded_pis.index,
     'Number of Projects': ff_funded_pis.values
 })
 
