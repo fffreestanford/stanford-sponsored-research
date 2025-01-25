@@ -7,20 +7,20 @@ import plotly.express as px
 # ChatGPT utilized for initial code generation + adapting to streamlit
 @st.cache_data
 def load_data():
-    results_df = pd.read_csv('processed/results_df.csv')
+    pi_project_count = pd.read_csv('processed/pi_project_count.csv')
     projects = pd.read_csv('data/Project_List_Report_2005_2024.csv')
     congo_companies = pd.read_csv('data/congo_sponsors.csv')
     fossil_companies = pd.read_csv('data/fossil_sponsors.csv')
-    return results_df, projects, congo_companies, fossil_companies
+    return pi_project_count, projects, congo_companies, fossil_companies
 
-results_df, projects, congo_companies, fossil_companies = load_data()
+pi_project_count, projects, congo_companies, fossil_companies = load_data()
 
 st.title('Stanford Fossil Fuel Funding Analysis')
 
 # Overall statistics
 st.header('Overall Statistics')
 total_pis = len(projects['Principal Investigator'].unique())
-ff_funded_pis = len(results_df)
+ff_funded_pis = len(pi_project_count)
 ff_funded_percent = (ff_funded_pis / total_pis * 100)
 
 st.write(f'Total PIs: {total_pis}')
