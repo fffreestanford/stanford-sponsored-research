@@ -45,7 +45,7 @@ for idx, project in awarded_projects.iterrows():
     dept_funding[dept]['total'] += amount
 
     # Check if any sponsor column matches FF companies
-    if any(project[col] in fossil_companies['Company Name'].values for col in ['Sponsor', 'Prime Sponsor']):
+    if any(project[col] in fossil_companies['Company Name'].values for col in ['Sponsor/Party']):
         dept_funding[dept]['ff'] += amount
 
 # Calculate percentages and create dataframe
