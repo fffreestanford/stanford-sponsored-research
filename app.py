@@ -14,7 +14,7 @@ def load_data():
     fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/ff_sponsors.csv')
     return pi_project_count, projects, congo_companies, fossil_companies
 
-pi_project_count, projects, congo_companies, fossil_companies = load_data()
+pi_project_count, projects, unique_pis, congo_companies, fossil_companies = load_data()
 
 st.title('Stanford Fossil Fuel Funding Analysis')
 
