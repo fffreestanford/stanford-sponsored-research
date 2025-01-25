@@ -98,10 +98,23 @@ st.header('Fossil-Funded PIs and their Projects')
 # Calculate the number of projects for each PI involved in FF-funded projects
 ff_funded_pis = projects['Principal Investigator'].value_counts()
 
-# Join the PI project counts with the PI data
+# Create a DataFrame for PIs and their project counts
 pi_projects_df = pd.DataFrame({
     'Principal Investigator': ff_funded_pis.index,
     'Number of Projects': ff_funded_pis.values
 })
 
 st.dataframe(pi_projects_df)
+
+# Add interactivity: allow user to select a PI
+selected_pi = st.selectbox('Select a Principal Investigator', pi_projects_df['Principal Investigator'])
+
+# Show the sponsors for the selected PI
+st.subheader(f'Sponsors for {selected_pi}')
+sponsors_for_pi = awarded_projects[awarded_projects['Principal Investigator'] == selected_pi]['Sponsor/Party'].unique()
+
+# Display the sponsors
+if len(sponsors_for_pi) > 0:
+    st.write(", ".join(sponsors_for_pi))
+else:
+    st.write("No sponsors found for this PI.")
