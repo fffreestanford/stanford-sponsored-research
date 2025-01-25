@@ -38,8 +38,8 @@ for sponsor, faculty_dict in active_projects_by_faculty.items():
         faculty_projects = faculty_dict[selected_pi]
         selected_projects.append(faculty_projects)
         
-        # Track sponsors where the selected PI has more than 0 projects
-        if (faculty_projects > 0).any():  # If there are any years where the PI has more than 0 projects for this sponsor
+        # Track sponsors where the selected PI has more than 0 projects (sum of projects > 0)
+        if faculty_projects.sum() > 0:  # If the sum of projects across all years is > 0
             sponsors_with_projects.append(sponsor)
 
 # Combine the yearly counts for the selected PI across all sponsors
