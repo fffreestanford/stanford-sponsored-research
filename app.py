@@ -8,7 +8,7 @@ import plotly.express as px
 @st.cache_data
 def load_data():
     pi_project_count = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/pi_project_count.csv')
-    projects = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/ff_funded.csv')
+    projects = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/project_list_report_2005_2024_filtered.csv')
     unique_pis = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/unique_pis.csv')
     congo_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/congo_sponsors.csv').iloc[:,0].tolist()
     fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/ff_sponsors.csv').iloc[:,0].tolist()
@@ -19,11 +19,15 @@ def load_data():
 
 pi_project_count, projects, unique_pis, congo_companies, fossil_companies, bigtech_defense_companies, dept_counts, active_projects_by_faculty = load_data()
 
-st.title('Stanford Fossil Fuel Funding Analysis')
+st.title('Stanford Fossil Fuel and Big Tech Funding')
+
+# Filter the list of Principal Investigators based on those who appear in the projects dataset
+active_pis = projects['Principal Investigator'].unique()  # Get all PIs from the projects dataset
+available_pis = unique_pis[unique_pis['Principal Investigator'].isin(active_pis)]  # Filter the unique PIs based on those in projects
 
 # Select a PI (faculty member)
 st.header('Select a Principal Investigator (PI)')
-selected_pi = st.selectbox('Select a Principal Investigator', unique_pis['Principal Investigator'])
+selected_pi = st.selectbox('Select a Principal Investigator', available_pis['Principal Investigator'])
 
 # Retrieve the projects for the selected PI from the active_projects_by_faculty dictionary
 selected_projects = []
@@ -63,5 +67,3 @@ if selected_projects:
     st.plotly_chart(fig)
 else:
     st.write("No projects found for the selected PI.")
-
-
