@@ -12,7 +12,7 @@ def load_data():
     unique_pis = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/unique_pis.csv')
     congo_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/congo_sponsors.csv')
     fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/ff_sponsors.csv')
-    return pi_project_count, projects, congo_companies, fossil_companies
+    return pi_project_count, projects, unique_pis, congo_companies, fossil_companies
 
 pi_project_count, projects, unique_pis, congo_companies, fossil_companies = load_data()
 
