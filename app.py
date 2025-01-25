@@ -10,8 +10,8 @@ def load_data():
     pi_project_count = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/pi_project_count.csv')
     projects = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/ff_funded.csv')
     unique_pis = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/unique_pis.csv')
-    congo_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/congo_sponsors.csv')
-    fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/ff_sponsors.csv')
+    congo_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/congo_sponsors.csv').iloc[:,0].tolist()
+    fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/ff_sponsors.csv').iloc[:,0].tolist()
     return pi_project_count, projects, unique_pis, congo_companies, fossil_companies
 
 pi_project_count, projects, unique_pis, congo_companies, fossil_companies = load_data()
@@ -45,7 +45,7 @@ for idx, project in awarded_projects.iterrows():
     dept_funding[dept]['total'] += amount
 
     # Check if any sponsor column matches FF companies
-    if any(project[col] in fossil_companies['Company Name'].values for col in ['Sponsor/Party']):
+    if any(project[col] in fossil_companies for col in ['Sponsor/Party']):
         dept_funding[dept]['ff'] += amount
 
 # Calculate percentages and create dataframe
