@@ -9,6 +9,7 @@ import plotly.express as px
 def load_data():
     pi_project_count = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/pi_project_count.csv')
     projects = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/ff_funded.csv')
+    unique_pis = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/unique_pis.csv')
     congo_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/congo_sponsors.csv')
     fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/fossil_sponsors.csv')
     return pi_project_count, projects, congo_companies, fossil_companies
@@ -19,7 +20,7 @@ st.title('Stanford Fossil Fuel Funding Analysis')
 
 # Overall statistics
 st.header('Overall Statistics')
-total_pis = len(projects['Principal Investigator'].unique())
+total_pis = len(unique_pis)
 ff_funded_pis = len(pi_project_count)
 ff_funded_percent = (ff_funded_pis / total_pis * 100)
 
