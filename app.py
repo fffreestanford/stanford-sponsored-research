@@ -9,8 +9,11 @@ import matplotlib.pyplot as plt
 # Code generated / adjusted with prompts to Claude 3.5
 
 # Import files from fffreestanford github
-results_df = pd.read_csv('results_df.csv')
 
+results_df = pd.read_csv('results_df.csv')
+projects = pd.read_csv('Project_List_Report_2005_2024.csv')
+congo_companies = pd.read_csv('congo_sponsors.csv')
+fossil_companies = pd.red_csv('fossil_sponsors.csv')
 
 # Pie chart - percentage of PIs with FF funding
 total_pis = len(projects['Principal Investigator'].unique())
@@ -19,19 +22,6 @@ ff_funded_percent = (ff_funded_pis / total_pis * 100)
 print(f'Total PIs: {total_pis}')
 print(f'PIs with FF Funding: {ff_funded_pis}')
 print(f'Percentage of PIs with FF Funding: {ff_funded_percent:.1f}%)')
-
-# Create pie chart
-non_ff_percent = 100 - ff_funded_percent
-
-labels = ['PIs with FF Funding', 'PIs without FF Funding']
-sizes = [ff_funded_percent, non_ff_percent]
-colors = ['#ff9999', '#66b3ff']
-
-plt.figure(figsize=(4, 4))
-plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%')
-plt.title('Distribution of PIs with Fossil Fuel Funding')
-plt.axis('equal')
-plt.show()
 
 # Calculate funding by department
 dept_funding = {}
@@ -104,33 +94,3 @@ plt.show()
 ## -- add faculty who are indirectly accepting FF funds through Industrial Affiliate Programs
 ## -- add a year-by-year breakdown: is the number of faculty accepting fossil fuel money increasing,
 ##    decreasing, or staying the same over time? I.e. is Stanford getting better or worse?
-
-"""# CONGO"""
-
-# Find matches where a Congo company is in the sponsor column
-matches = projects['Sponsor/Party'].apply(lambda x: any(company in str(x) for company in congo_companies))
-
-# Calculate Congo funding percentage per PI
-pi_stats = []
-for pi in projects['Principal Investigator'].unique():
-    pi_projects = projects[(projects['Principal Investigator'] == pi) & (projects['Project Status'].isin(['Awarded', 'Approved']))]
-    total_projects = len(pi_projects)
-
-    # Count Congo funded projects using matches
-    congo_funded = matches[pi_projects.index].sum()
-
-    congo_percentage = (congo_funded / total_projects * 100) if total_projects > 0 else 0
-    pi_stats.append({
-        'PI': pi,
-        'Total Projects': total_projects,
-        'Congo Funded Projects': congo_funded,
-        'Congo Funding Percentage': round(congo_percentage, 1)
-    })
-
-# Create and display results dataframe
-results_df = pd.DataFrame(pi_stats)
-results_df = results_df[results_df['Congo Funded Projects'] > 0]
-results_df = results_df.sort_values('Congo Funding Percentage', ascending=False)
-results_df = results_df.reset_index(drop=True)
-print("\nPrincipal Investigator Congo Funding Statistics for Awarded Projects:")
-print(results_df[['PI','Congo Funded Projects','Congo Funding Percentage']].head(15))
