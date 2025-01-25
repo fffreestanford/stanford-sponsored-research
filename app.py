@@ -31,9 +31,16 @@ selected_pi = st.selectbox('Select a Principal Investigator', available_pis['Pri
 
 # Retrieve the projects for the selected PI from the active_projects_by_faculty dictionary
 selected_projects = []
+sponsors_with_projects = []  # To keep track of sponsors that have more than 0 projects for the selected PI
+
 for sponsor, faculty_dict in active_projects_by_faculty.items():
     if selected_pi in faculty_dict:
-        selected_projects.append(faculty_dict[selected_pi])
+        faculty_projects = faculty_dict[selected_pi]
+        selected_projects.append(faculty_projects)
+        
+        # Track sponsors where the selected PI has more than 0 projects
+        if (faculty_projects > 0).any():  # If there are any years where the PI has more than 0 projects for this sponsor
+            sponsors_with_projects.append(sponsor)
 
 # Combine the yearly counts for the selected PI across all sponsors
 if selected_projects:
@@ -43,23 +50,24 @@ if selected_projects:
     # Transpose and clean up the data to have years as rows and sponsors as columns
     yearly_data = yearly_data.rename_axis('Year').reset_index()
 
-    # Filter out sponsors where the number of projects is <= 1
-    yearly_data = yearly_data.loc[:, (yearly_data > 1).sum(axis=0) > 0]
+    # Filter the sponsors where the number of projects is > 0 for the selected PI
+    filtered_yearly_data = yearly_data[['Year'] + sponsors_with_projects]
 
     # Plot the line chart
-    st.subheader(f'Projects Per Year for {selected_pi}')
+    st.subheader(f'Projects Per Year for {selected_pi} by Sponsor')
     fig = go.Figure()
 
-    for sponsor in yearly_data.columns[1:]:  # Skip the 'Year' column
+    # Plot each sponsor as a separate line if they have more than 0 projects
+    for sponsor in sponsors_with_projects:
         fig.add_trace(go.Scatter(
-            x=yearly_data['Year'],
-            y=yearly_data[sponsor],
+            x=filtered_yearly_data['Year'],
+            y=filtered_yearly_data[sponsor],
             mode='lines+markers',
             name=sponsor
         ))
 
     fig.update_layout(
-        title=f'Projects Per Year for {selected_pi}',
+        title=f'Projects Per Year for {selected_pi} by Sponsor',
         xaxis_title='Year',
         yaxis_title='Number of Projects',
         showlegend=True
