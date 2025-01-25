@@ -12,9 +12,10 @@ def load_data():
     unique_pis = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/unique_pis.csv')
     congo_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/congo_sponsors.csv').iloc[:,0].tolist()
     fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/ff_sponsors.csv').iloc[:,0].tolist()
-    return pi_project_count, projects, unique_pis, congo_companies, fossil_companies
+    dept_counts = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/department_counts.csv')  # New file
+    return pi_project_count, projects, unique_pis, congo_companies, fossil_companies, dept_counts
 
-pi_project_count, projects, unique_pis, congo_companies, fossil_companies = load_data()
+pi_project_count, projects, unique_pis, congo_companies, fossil_companies, dept_counts = load_data()
 
 st.title('Stanford Fossil Fuel Funding Analysis')
 
@@ -48,15 +49,24 @@ for idx, project in awarded_projects.iterrows():
     if any(project[col] in fossil_companies for col in ['Sponsor/Party']):
         dept_funding[dept]['ff'] += amount
 
-# Calculate percentages and create dataframe
+# Now add the total number of projects from dept_counts to the department funding
+dept_counts = dept_counts.set_index('Department')  # Set department as index for easy access
+
+# Calculate the total number of projects by combining the funding and the department counts
+dept_project_count = awarded_projects.groupby('Department').size()  # Get the count of awarded projects per department
+dept_project_count = dept_project_count.add(dept_counts['Number of Projects'], fill_value=0)  # Add the number of projects from dept_counts
+
+# Merge the dept_project_count into the dept_funding stats
 dept_stats = []
 for dept, amounts in dept_funding.items():
+    total_projects = dept_project_count.get(dept, 0)  # Get the number of projects for that department
     ff_pct = (amounts['ff'] / amounts['total'] * 100) if amounts['total'] > 0 else 0
     dept_stats.append({
         'Department': dept,
         'FF Funding': amounts['ff'],
         'Total Funding': amounts['total'],
-        'FF Percentage': ff_pct
+        'FF Percentage': ff_pct,
+        'Total Projects': total_projects  # Add total projects for that department
     })
 
 dept_df = pd.DataFrame(dept_stats)
@@ -64,7 +74,7 @@ dept_df = dept_df.sort_values('FF Funding', ascending=False)
 n_depts = 6
 top_depts = dept_df.head(n_depts)
 
-# Overall statistics
+# Overall statistics for funding
 total_funding = dept_df['Total Funding'].sum()
 ff_funding = dept_df['FF Funding'].sum()
 ff_funding_pct = (ff_funding / total_funding * 100) if total_funding > 0 else 0
@@ -97,7 +107,11 @@ fig_bar = px.bar(
 fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
 st.plotly_chart(fig_bar)
 
-# TODO:
+# Show the department funding table
+st.subheader('Department Funding Breakdown')
+st.dataframe(dept_df[['Department', 'Total Projects', 'FF Funding', 'Total Funding', 'FF Percentage']])
+
+# TODO: Future Improvements
 st.header('Future Improvements')
 st.markdown("""
 - Add faculty who are indirectly accepting FF funds through Industrial Affiliate Programs
