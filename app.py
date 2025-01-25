@@ -7,10 +7,10 @@ import plotly.express as px
 # ChatGPT utilized for initial code generation + adapting to streamlit
 @st.cache_data
 def load_data():
-    pi_project_count = pd.read_csv('https://github.com/fffreestanford/stanford-sponsored-research/raw/refs/heads/main/processed/pi_project_count.csv')
-    projects = pd.read_csv('https://github.com/fffreestanford/stanford-sponsored-research/raw/refs/heads/main/data/Project_List_Report_2005_2024.csv')
-    congo_companies = pd.read_csv('https://github.com/fffreestanford/stanford-sponsored-research/raw/refs/heads/main/data/congo_sponsors.csv')
-    fossil_companies = pd.read_csv('https://github.com/fffreestanford/stanford-sponsored-research/raw/refs/heads/main/data/fossil_sponsors.csv')
+    pi_project_count = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/pi_project_count')
+    projects = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/Project_List_Report_2005_2024.csv')
+    congo_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/congo_sponsors.csv')
+    fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/fossil_sponsors.csv')
     return pi_project_count, projects, congo_companies, fossil_companies
 
 pi_project_count, projects, congo_companies, fossil_companies = load_data()
