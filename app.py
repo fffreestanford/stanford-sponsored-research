@@ -7,10 +7,10 @@ import plotly.express as px
 # ChatGPT utilized for initial code generation + adapting to streamlit
 @st.cache_data
 def load_data():
-    results_df = pd.read_csv('results_df.csv')
-    projects = pd.read_csv('Project_List_Report_2005_2024.csv')
-    congo_companies = pd.read_csv('congo_sponsors.csv')
-    fossil_companies = pd.read_csv('fossil_sponsors.csv')
+    results_df = pd.read_csv('processed/results_df.csv')
+    projects = pd.read_csv('data/Project_List_Report_2005_2024.csv')
+    congo_companies = pd.read_csv('data/congo_sponsors.csv')
+    fossil_companies = pd.read_csv('data/fossil_sponsors.csv')
     return results_df, projects, congo_companies, fossil_companies
 
 results_df, projects, congo_companies, fossil_companies = load_data()
