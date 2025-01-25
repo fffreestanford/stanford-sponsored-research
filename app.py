@@ -32,84 +32,76 @@ st.write(f'Percentage of PIs with FF Funding: {ff_funded_percent:.1f}%')
 # Funding analysis
 st.header('Funding Analysis')
 
-# Calculate funding by department
+# Calculate the number of fossil-funded projects by department
 dept_funding = {}
 awarded_projects = projects[projects['Project Status'] == 'Awarded']
 
-for idx, project in awarded_projects.iterrows():
-    dept = project['Department']
-    amount = float(project['Funded'].replace('$', '').replace(',', ''))
+# Count FF-funded projects by department
+ff_projects_by_dept = awarded_projects.groupby('Department').size()
 
-    if dept not in dept_funding:
-        dept_funding[dept] = {'ff': 0, 'total': 0}
-
-    dept_funding[dept]['total'] += amount
-
-    # Check if any sponsor column matches FF companies
-    if any(project[col] in fossil_companies for col in ['Sponsor/Party']):
-        dept_funding[dept]['ff'] += amount
-
-# Now add the total number of projects from dept_counts to the department funding
+# Add the total number of projects from dept_counts
 dept_counts = dept_counts.set_index('Department')  # Set department as index for easy access
+total_projects_by_dept = dept_counts['Number of Projects']  # Get total number of projects per department
 
-# Calculate the total number of projects by combining the funding and the department counts
-dept_project_count = awarded_projects.groupby('Department').size()  # Get the count of awarded projects per department
-dept_project_count = dept_project_count.add(dept_counts['Number of Projects'], fill_value=0)  # Add the number of projects from dept_counts
-
-# Merge the dept_project_count into the dept_funding stats
+# Calculate the FF projects percentage for each department
 dept_stats = []
-for dept, amounts in dept_funding.items():
-    total_projects = dept_project_count.get(dept, 0)  # Get the number of projects for that department
-    ff_pct = (amounts['ff'] / amounts['total'] * 100) if amounts['total'] > 0 else 0
+for dept in total_projects_by_dept.index:
+    ff_projects = ff_projects_by_dept.get(dept, 0)  # Number of FF-funded projects for this department
+    total_projects = total_projects_by_dept[dept]  # Total number of projects for this department
+    ff_pct = (ff_projects / total_projects * 100) if total_projects > 0 else 0
     dept_stats.append({
         'Department': dept,
-        'FF Funding': amounts['ff'],
-        'Total Funding': amounts['total'],
-        'FF Percentage': ff_pct,
-        'Total Projects': total_projects  # Add total projects for that department
+        'FF Projects': ff_projects,
+        'Total Projects': total_projects,
+        'FF Percentage': ff_pct
     })
 
 dept_df = pd.DataFrame(dept_stats)
-dept_df = dept_df.sort_values('FF Funding', ascending=False)
+dept_df = dept_df.sort_values('FF Projects', ascending=False)
 n_depts = 6
 top_depts = dept_df.head(n_depts)
 
-# Overall statistics for funding
-total_funding = dept_df['Total Funding'].sum()
-ff_funding = dept_df['FF Funding'].sum()
-ff_funding_pct = (ff_funding / total_funding * 100) if total_funding > 0 else 0
+# Overall statistics for projects
+total_projects = dept_df['Total Projects'].sum()
+ff_projects = dept_df['FF Projects'].sum()
+ff_projects_pct = (ff_projects / total_projects * 100) if total_projects > 0 else 0
 
-st.write(f"Total Funding: ${total_funding:,.2f}")
-st.write(f"Fossil Fuel Funding: ${ff_funding:,.2f}")
-st.write(f"Percentage from Fossil Fuel Sources: {ff_funding_pct:.1f}%")
+st.write(f"Total Projects: {total_projects:,.0f}")
+st.write(f"Fossil Fuel Projects: {ff_projects:,.0f}")
+st.write(f"Percentage from Fossil Fuel Projects: {ff_projects_pct:.1f}%")
 
 # Visualizations
 st.header('Visualizations')
 
-# Overall pie chart
-fig_pie = go.Figure(data=[go.Pie(
-    labels=['FF Funding', 'Other Funding'],
-    values=[ff_funding_pct, 100-ff_funding_pct],
-    marker_colors=['#ff9999', '#66b3ff']
-)])
-fig_pie.update_layout(title='Stanford-Wide Sponsored Research Funds')
-st.plotly_chart(fig_pie)
-
-# Top departments bar chart
+# Top departments bar chart (based on FF project count)
 fig_bar = px.bar(
     top_depts,
     x='FF Percentage',
     y='Department',
     orientation='h',
-    title=f'Top {n_depts} Departments by FF Funding Percentage',
+    title=f'Top {n_depts} Departments by FF Project Percentage',
     color_discrete_sequence=['#ff9999']
 )
 fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
 st.plotly_chart(fig_bar)
 
-# Show the department funding table
-st.subheader('Department Funding Breakdown')
-st.dataframe(dept_df[['Department', 'Total Projects', 'FF Funding', 'Total Funding', 'FF Percentage']])
+# Show the department project breakdown table
+st.subheader('Department Project Breakdown')
+st.dataframe(dept_df[['Department', 'Total Projects', 'FF Projects', 'FF Percentage']])
+
+# Table of Fossil-Funded PIs and their Project Counts
+st.header('Fossil-Funded PIs and their Projects')
+
+# Calculate the number of projects for each PI involved in FF-funded projects
+ff_funded_pis = awarded_projects[awarded_projects['Project Status'] == 'Awarded']['PI'].value_counts()
+
+# Join the PI project counts with the PI data
+pi_projects_df = pd.DataFrame({
+    'PI': ff_funded_pis.index,
+    'Number of Projects': ff_funded_pis.values
+})
+
+st.dataframe(pi_projects_df)
 
 # TODO: Future Improvements
 st.header('Future Improvements')
