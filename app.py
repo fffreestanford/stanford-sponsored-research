@@ -73,9 +73,12 @@ st.write(f"Percentage from Fossil Fuel Projects: {ff_projects_pct:.1f}%")
 # Visualizations
 st.header('Visualizations')
 
+# Filter the departments where FF Projects is greater than 0
+dept_df_nonzero_ff = dept_df[dept_df['FF Projects'] > 0]
+
 # Top departments bar chart (based on FF project count)
 fig_bar = px.bar(
-    top_depts,
+    dept_df_nonzero_ff,  # Use the filtered dataframe
     x='FF Percentage',
     y='Department',
     orientation='h',
@@ -86,8 +89,8 @@ fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
 st.plotly_chart(fig_bar)
 
 # Show the department project breakdown table
-st.subheader('Department Project Breakdown')
-st.dataframe(dept_df[['Department', 'Total Projects', 'FF Projects', 'FF Percentage']])
+st.subheader('Department Project Breakdown (FF Projects > 0)')
+st.dataframe(dept_df_nonzero_ff[['Department', 'Total Projects', 'FF Projects', 'FF Percentage']])
 
 # Table of Fossil-Funded PIs and their Project Counts
 st.header('Fossil-Funded PIs and their Projects')
@@ -102,11 +105,3 @@ pi_projects_df = pd.DataFrame({
 })
 
 st.dataframe(pi_projects_df)
-
-# TODO: Future Improvements
-st.header('Future Improvements')
-st.markdown("""
-- Add faculty who are indirectly accepting FF funds through Industrial Affiliate Programs
-- Add a year-by-year breakdown: is the number of faculty accepting fossil fuel money increasing,
-  decreasing, or staying the same over time? I.e. is Stanford getting better or worse?
-""")
