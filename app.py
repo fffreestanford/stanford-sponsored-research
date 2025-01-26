@@ -84,6 +84,8 @@ sponsors_with_projects = []
 for sponsor, faculty_dict in active_projects_by_faculty.items():
     if selected_pi in faculty_dict:
         faculty_projects = faculty_dict[selected_pi]
+        if isinstance(faculty_projects, list) or isinstance(faculty_projects, dict):
+            faculty_projects = pd.Series(faculty_projects)
         selected_projects.append(faculty_projects)
         
         if faculty_projects.sum() > 0:
