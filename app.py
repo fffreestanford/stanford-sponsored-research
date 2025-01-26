@@ -20,6 +20,7 @@ def load_data():
     fossil_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/ff_sponsors.csv').iloc[:,0].tolist()
     bigtech_defense_companies = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/data/bigtech_defense_sponsors.csv').iloc[:,0].tolist()
     dept_counts = pd.read_csv('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/department_counts.csv')
+    # dept_counts.set_index('Department', inplace=True)
     active_projects_by_faculty = pd.read_pickle('https://raw.githubusercontent.com/fffreestanford/stanford-sponsored-research/refs/heads/main/processed/active_projects_by_company_and_faculty.pkl')
     return pi_project_count, projects, unique_pis, congo_companies, fossil_companies, bigtech_defense_companies, dept_counts, active_projects_by_faculty
 
@@ -27,10 +28,11 @@ pi_project_count, projects, unique_pis, congo_companies, fossil_companies, bigte
 
 st.title('Stanford Fossil Fuel and Big Tech Funding')
 
+sponsor_options = [col for col in dept_counts.columns if col != 'Department']
 # selectbox to choose the sponsor type
 sponsor_type = st.selectbox(
     'Select Sponsor Type',
-    ['Fossil Fuel Sponsors', 'Big Tech / Defense Sponsors']
+    sponsor_options
 )
 
 if sponsor_type == 'Fossil Fuel Sponsors':
@@ -55,7 +57,6 @@ fig_bar = px.bar(
 st.plotly_chart(fig_bar)
 st.subheader(f'Department Project Breakdown for {sponsor_label}')
 st.dataframe(dept_df_nonzero[['Department', 'Total Projects', sponsor_column]])
-
 
 # Filter the list of Principal Investigators based on those who appear in the projects dataset
 active_pis = projects['Principal Investigator'].unique()
