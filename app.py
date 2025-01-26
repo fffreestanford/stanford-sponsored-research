@@ -35,28 +35,21 @@ sponsor_type = st.selectbox(
     sponsor_options
 )
 
-if sponsor_type == 'Fossil Fuel Sponsors':
-    sponsor_column = 'FF Projects'
-    sponsor_label = "Fossil Fuel Sponsors"
-else:
-    sponsor_column = 'Bigtech Projects'
-    sponsor_label = "Big Tech / Defense Sponsors"
-
 # Filter departments where the selected project type is greater than 0
-dept_df_nonzero = dept_counts[dept_counts[sponsor_column] > 0]
+dept_df_nonzero = dept_counts[dept_counts[sponsor_type] > 0]
 
 # Create and show the bar chart for departments with projects sponsored by the selected sponsor type
 fig_bar = px.bar(
     dept_df_nonzero,
-    x=sponsor_column,
+    x=sponsor_type,
     y='Department',
     orientation='h',
-    title=f'Department Projects Sponsored by {sponsor_label}'
+    title=f'Department Projects from {sponsor_type}'
 )
 
 st.plotly_chart(fig_bar)
-st.subheader(f'Department Project Breakdown for {sponsor_label}')
-st.dataframe(dept_df_nonzero[['Department', 'Total Projects', sponsor_column]])
+st.subheader(f'Department Project Breakdown for {sponsor_type}')
+st.dataframe(dept_df_nonzero[['Department', 'Total Projects', sponsor_type]])
 
 # Filter the list of Principal Investigators based on those who appear in the projects dataset
 active_pis = projects['Principal Investigator'].unique()
