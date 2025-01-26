@@ -37,7 +37,7 @@ if sponsor_type == 'Fossil Fuel Sponsors':
     sponsor_column = 'FF Projects'
     sponsor_label = "Fossil Fuel Sponsors"
 else:
-    sponsor_column = 'BigTech Projects'
+    sponsor_column = 'Bigtech Projects'
     sponsor_label = "Big Tech / Defense Sponsors"
 
 # Filter departments where the selected project type is greater than 0
