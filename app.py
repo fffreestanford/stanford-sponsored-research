@@ -27,47 +27,47 @@ pi_project_count, projects, unique_pis, congo_companies, fossil_companies, bigte
 
 st.title('Stanford Fossil Fuel and Big Tech Funding')
 
-# Calculate the number of FF-funded projects by department
-awarded_projects = projects[projects['Project Status'] == 'Awarded']
-ff_projects_by_dept = awarded_projects[awarded_projects['Sponsor/Party'].isin(fossil_companies)].groupby('Department').size()
+# Add a selectbox to choose the sponsor type
+sponsor_type = st.selectbox(
+    'Select Sponsor Type',
+    ['Fossil Fuel Sponsors', 'Big Tech / Defense Sponsors']
+)
 
-# Combine this with the total number of projects from dept_counts
-dept_counts = dept_counts.set_index('Department')  # Ensure dept_counts is indexed by department
-total_projects_by_dept = dept_counts['Number of Projects']
+# Filter departments based on selected sponsor type
+if sponsor_type == 'Fossil Fuel Sponsors':
+    sponsor_list = fossil_companies
+    sponsor_label = "Fossil Fuel Sponsors"
+else:
+    sponsor_list = bigtech_defense_companies
+    sponsor_label = "Big Tech / Defense Sponsors"
 
-# Calculate the FF-funded project percentage for each department
-dept_stats = []
-for dept in total_projects_by_dept.index:
-    ff_projects = ff_projects_by_dept.get(dept, 0)
-    total_projects = total_projects_by_dept[dept]
-    ff_percentage = (ff_projects / total_projects * 100) if total_projects > 0 else 0
-    dept_stats.append({
-        'Department': dept,
-        'FF Projects': ff_projects,
-        'Total Projects': total_projects,
-        'FF Percentage': ff_percentage
-    })
+# Filter departments where FF Projects is greater than 0 and sponsored by the selected sponsor type
+dept_df_nonzero_ff = dept_counts[dept_counts['FF Projects'] > 0]
 
-dept_df = pd.DataFrame(dept_stats)
-dept_df = dept_df.sort_values('FF Projects', ascending=False)
+# Create a new column to identify which sponsor categories are in each department
+dept_df_nonzero_ff['Sponsored by Fossil Fuel or Big Tech/Defense'] = dept_df_nonzero_ff['Sponsor'].apply(
+    lambda sponsor: sponsor in sponsor_list
+)
 
-# Filter departments where FF Projects is greater than 0
-dept_df_nonzero_ff = dept_df[dept_df['FF Projects'] > 0]
+# Filter departments where the selected sponsor type is present
+filtered_dept_df = dept_df_nonzero_ff[dept_df_nonzero_ff['Sponsored by Fossil Fuel or Big Tech/Defense']]
 
-# Visualize the data with a bar chart
+# Create the bar chart for departments with projects sponsored by the selected sponsor type
 fig_bar = px.bar(
-    dept_df_nonzero_ff,
+    filtered_dept_df,
     x='FF Percentage',
     y='Department',
     orientation='h',
-    title='Departments by Fossil Fuel Project Percentage'
+    title=f'Department Projects Sponsored by {sponsor_label}'
 )
 
+# Show the department project breakdown table
 st.plotly_chart(fig_bar)
 
 # Show the department project breakdown table
-st.subheader('Department Project Breakdown (FF Projects > 0)')
-st.dataframe(dept_df_nonzero_ff[['Department', 'Total Projects', 'FF Projects', 'FF Percentage']])
+st.subheader(f'Department Project Breakdown for {sponsor_label}')
+st.dataframe(filtered_dept_df[['Department', 'Total Projects', 'FF Projects', 'FF Percentage']])
+
 
 # Filter the list of Principal Investigators based on those who appear in the projects dataset
 active_pis = projects['Principal Investigator'].unique()
