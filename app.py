@@ -46,10 +46,7 @@ fig_bar = px.bar(
     orientation='h',
     title=f'Department Projects from {sponsor_type}'
 )
-
 st.plotly_chart(fig_bar)
-st.subheader(f'Department Project Breakdown for {sponsor_type}')
-st.dataframe(dept_df_nonzero[['Department', 'Total Projects', sponsor_type]])
 
 # Filter the list of Principal Investigators based on those who appear in the projects dataset
 active_pis = projects['Principal Investigator'].unique()
