@@ -75,6 +75,9 @@ if selected_projects:
     yearly_data = pd.DataFrame(selected_projects).transpose()
     yearly_data = yearly_data.rename_axis('Year').reset_index()
 
+    st.write("Yearly Data Columns:", yearly_data.columns)
+    st.dataframe(yearly_data)
+
     # Filter where the number of projects is > 0 for the selected PI
     filtered_yearly_data = yearly_data[['Year'] + sponsors_with_projects]
     
