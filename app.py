@@ -21,6 +21,23 @@ pi_project_count, projects, unique_pis, congo_companies, fossil_companies, bigte
 
 st.title('Stanford Fossil Fuel and Big Tech Funding')
 
+# Filter the departments where FF Projects is greater than 0
+dept_df_nonzero_ff = dept_df[dept_df['FF Projects'] > 0]
+
+# Top departments bar chart (based on FF project count)
+fig_bar = px.bar(
+    top_depts,
+    dept_df_nonzero_ff,  # Use the filtered dataframe
+    x='FF Percentage',
+    y='Department',
+    orientation='h',
+@@ -86,8 +89,8 @@ def load_data():
+st.plotly_chart(fig_bar)
+
+# Show the department project breakdown table
+st.subheader('Department Project Breakdown')
+st.dataframe(dept_df_nonzero_ff[['Department', 'Total Projects', 'FF Projects', 'FF Percentage']])
+
 # Filter the list of Principal Investigators based on those who appear in the projects dataset
 active_pis = projects['Principal Investigator'].unique()  # Get all PIs from the projects dataset
 available_pis = unique_pis[unique_pis['Principal Investigator'].isin(active_pis)]  # Filter the unique PIs based on those in projects
