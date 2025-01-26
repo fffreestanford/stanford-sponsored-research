@@ -30,8 +30,7 @@ fig_bar = px.bar(
     dept_df_nonzero_ff,  # Use the filtered dataframe
     x='FF Percentage',
     y='Department',
-    orientation='h',
-@@ -86,8 +89,8 @@ def load_data():
+    orientation='h')
 st.plotly_chart(fig_bar)
 
 # Show the department project breakdown table
