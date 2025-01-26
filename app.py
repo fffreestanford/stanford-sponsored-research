@@ -27,46 +27,34 @@ pi_project_count, projects, unique_pis, congo_companies, fossil_companies, bigte
 
 st.title('Stanford Fossil Fuel and Big Tech Funding')
 
-# Add a selectbox to choose the sponsor type
+# selectbox to choose the sponsor type
 sponsor_type = st.selectbox(
     'Select Sponsor Type',
     ['Fossil Fuel Sponsors', 'Big Tech / Defense Sponsors']
 )
 
-# Filter departments based on selected sponsor type
 if sponsor_type == 'Fossil Fuel Sponsors':
-    sponsor_list = fossil_companies
+    sponsor_column = 'FF Projects'
     sponsor_label = "Fossil Fuel Sponsors"
 else:
-    sponsor_list = bigtech_defense_companies
+    sponsor_column = 'BigTech Projects'
     sponsor_label = "Big Tech / Defense Sponsors"
 
-# Filter departments where FF Projects is greater than 0 and sponsored by the selected sponsor type
-dept_df_nonzero_ff = dept_counts[dept_counts['FF Projects'] > 0]
+# Filter departments where the selected project type is greater than 0
+dept_df_nonzero = dept_counts[dept_counts[sponsor_column] > 0]
 
-# Create a new column to identify which sponsor categories are in each department
-dept_df_nonzero_ff['Sponsored by Fossil Fuel or Big Tech/Defense'] = dept_df_nonzero_ff['Sponsor'].apply(
-    lambda sponsor: sponsor in sponsor_list
-)
-
-# Filter departments where the selected sponsor type is present
-filtered_dept_df = dept_df_nonzero_ff[dept_df_nonzero_ff['Sponsored by Fossil Fuel or Big Tech/Defense']]
-
-# Create the bar chart for departments with projects sponsored by the selected sponsor type
+# Create and show the bar chart for departments with projects sponsored by the selected sponsor type
 fig_bar = px.bar(
-    filtered_dept_df,
-    x='FF Percentage',
+    dept_df_nonzero,
+    x=sponsor_column,
     y='Department',
     orientation='h',
     title=f'Department Projects Sponsored by {sponsor_label}'
 )
 
-# Show the department project breakdown table
 st.plotly_chart(fig_bar)
-
-# Show the department project breakdown table
 st.subheader(f'Department Project Breakdown for {sponsor_label}')
-st.dataframe(filtered_dept_df[['Department', 'Total Projects', 'FF Projects', 'FF Percentage']])
+st.dataframe(dept_df_nonzero[['Department', 'Total Projects', sponsor_column]])
 
 
 # Filter the list of Principal Investigators based on those who appear in the projects dataset
