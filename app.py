@@ -31,33 +31,27 @@ selected_pi = st.selectbox('Select a Principal Investigator', available_pis['Pri
 
 # Retrieve the projects for the selected PI from the active_projects_by_faculty dictionary
 selected_projects = []
-sponsors_with_projects = []  # To keep track of sponsors that have more than 0 projects for the selected PI
+sponsors_with_projects = []
 
 for sponsor, faculty_dict in active_projects_by_faculty.items():
     if selected_pi in faculty_dict:
         faculty_projects = faculty_dict[selected_pi]
-        selected_projects.append(faculty_projects)
-        
-        # Track sponsors where the selected PI has more than 0 projects (sum of projects > 0)
-        if faculty_projects.sum() > 0:  # If the sum of projects across all years is > 0
+        selected_projects.append(faculty_projects)   
+        print(faculty_projects)
+        if faculty_projects.sum() > 0:
             sponsors_with_projects.append(sponsor)
 
 # Combine the yearly counts for the selected PI across all sponsors
 if selected_projects:
-    # Create a DataFrame to hold the data for plotting
     yearly_data = pd.DataFrame(selected_projects).transpose()
-
-    # Transpose and clean up the data to have years as rows and sponsors as columns
     yearly_data = yearly_data.rename_axis('Year').reset_index()
 
-    # Filter the sponsors where the number of projects is > 0 for the selected PI
+    # filter where the number of projects is > 0 for the selected PI
     filtered_yearly_data = yearly_data[['Year'] + sponsors_with_projects]
-
-    # Plot the line chart
     st.subheader(f'Projects Per Year for {selected_pi} by Sponsor')
     fig = go.Figure()
 
-    # Plot each sponsor as a separate line if they have more than 0 projects
+    # plot each sponsor if they have more than 0 projects
     for sponsor in sponsors_with_projects:
         fig.add_trace(go.Scatter(
             x=filtered_yearly_data['Year'],
